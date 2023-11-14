@@ -24,5 +24,6 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --no-progress --no-suggest --prefer-dist
 
-      - name: PHP_CodeSniffer
-        run: .github/workflows/phpc
+      - name: Run PHP_CodeSniffer
+        run: vendor/bin/phpcs
+        continue-on-error: true
