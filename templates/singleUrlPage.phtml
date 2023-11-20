@@ -68,6 +68,18 @@
  */
 ?>
 
+<?php if ($successMessages !== null) : ?>
+    <div class="alert alert-success" role="alert">
+        <?= $successMessages[0] ?>
+    </div>
+<?php endif; ?>
+
+<?php if ($errorMessages !== null) : ?>
+    <div class="alert alert-danger" role="alert">
+        <?= $errorMessages[0] ?>
+    </div>
+<?php endif; ?>
+
 <div class="container mt-5">
     <div class="card">
         <div class="card-body">

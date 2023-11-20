@@ -4,7 +4,6 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
 use Slim\Views\PhpRenderer;
-use Slim\Flash\Messages;
 use DI\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Model;
@@ -12,10 +11,14 @@ use Illuminate\Database\Eloquent\Model;
 $container = new Container();
 AppFactory::setContainer($container);
 $app = AppFactory::create();
-
+session_start();
 
 $container->set('renderer', function () {
     return new PhpRenderer(__DIR__ . "/../templates");
+});
+
+$container->set('flash', function () {
+   return new \Slim\Flash\Messages();
 });
 
 $capsule = new Capsule;
@@ -61,7 +64,16 @@ $app->get('/urls/{id}', function ($request, $response, $args) {
        return $this->get('renderer')->render($response, 'urlNotFound.phtml');
    }
 
-   return $this->get('renderer')->render($response, 'singleUrlPage.phtml', ['url' => $url]);
+   $flash = $this->get('flash');
+
+   $successMessages = $flash->getMessage('success');
+   $errorMessages = $flash->getMessage('error');
+
+    return $this->get('renderer')->render($response, 'singleUrlPage.phtml', [
+        'url' => $url,
+        'successMessages' => $successMessages,
+        'errorMessages' => $errorMessages
+    ]);
 })->setName('singleUrlPage');
 
 $app->post('/analyze', function ($request, $response) use ($app) {
@@ -72,9 +84,16 @@ $app->post('/analyze', function ($request, $response) use ($app) {
     if ($existingUrl === null) {
         $url = new Url(['name' => $urlName]);
         $url->save();
+
+        $flash = $this->get('flash');
+        $flash->addMessage('success', 'Страница успешно добавлена');
+
         $id = $url->id;
     } else {
         $id = $existingUrl->id;
+
+        $flash = $this->get('flash');
+        $flash->addMessage('error', 'Страница уже существует');
     }
 
     $redirectedUrl = $app->getRouteCollector()->getRouteParser()->urlFor('singleUrlPage', ['id' => $id]);
