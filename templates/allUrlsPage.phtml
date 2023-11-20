@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Анализатор страницы</title>
+    <title>Список сайтов</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             padding-top: 60px;
         }
-
         footer.footer {
             position: absolute;
             bottom: 0;
@@ -21,7 +19,6 @@
         }
     </style>
 </head>
-
 <body>
 
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
@@ -44,26 +41,19 @@
 </nav>
 
 <main role="main" class="container">
-    <div class="jumbotron">
-        <h1 class="display-4">Добро пожаловать!</h1>
-        <p class="lead">Это анализатор страницы. Введите адрес веб-страницы для получения информации о ней.</p>
-        <form action="/analyze" method="POST">
-            <div class="form-row align-items-center">
-                <div class="col-auto">
-                    <label class="sr-only" for="url">Адрес страницы</label>
-                    <div class="input-group mb-2">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">https://</div>
-                        </div>
-                        <input type="url" class="form-control" id="url" name="url" placeholder="Введите адрес страницы" required>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary mb-2">Анализировать</button>
-                </div>
-            </div>
-        </form>
-    </div>
+    <h1>Список сайтов</h1>
+    <table class="table" data-test="urls">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название сайта</th>
+            <th>Дата создания</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
 </main>
 
 <footer class="footer">
@@ -76,5 +66,4 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-
 </html>
