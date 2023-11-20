@@ -4,6 +4,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
 use Slim\Views\PhpRenderer;
+use Slim\Flash\Messages;
 use DI\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 $container = new Container();
 AppFactory::setContainer($container);
 $app = AppFactory::create();
+
 
 $container->set('renderer', function () {
     return new PhpRenderer(__DIR__ . "/../templates");
@@ -43,18 +45,41 @@ $app->get('/', function ($request, $response) {
 });
 
 $app->get('/urls', function ($request, $response) {
+    $urls = Url::orderBy('created_at', 'desc')->get();
 
-
-    return $this->get('renderer')->render($response, 'allUrlsPage.phtml');
+    return $this->get('renderer')->render($response, 'allUrlsPage.phtml', [
+        'urls' => $urls
+    ]);
 });
 
-$app->post('/analyze', function ($request, $response) {
+$app->get('/urls/{id}', function ($request, $response, $args) {
+   $urlId = $args['id'];
+
+   $url = Url::find($urlId);
+
+   if (!$url) {
+       return $this->get('renderer')->render($response, 'urlNotFound.phtml');
+   }
+
+   return $this->get('renderer')->render($response, 'singleUrlPage.phtml', ['url' => $url]);
+})->setName('singleUrlPage');
+
+$app->post('/analyze', function ($request, $response) use ($app) {
     $urlName = $request->getParsedBody()['url'];
 
-    $url = new Url(['name' => $urlName]);
-    $url->save();
+    $existingUrl = Url::where('name', $urlName)->first();
 
-    return $response->withHeader('Location', '/');
+    if ($existingUrl === null) {
+        $url = new Url(['name' => $urlName]);
+        $url->save();
+        $id = $url->id;
+    } else {
+        $id = $existingUrl->id;
+    }
+
+    $redirectedUrl = $app->getRouteCollector()->getRouteParser()->urlFor('singleUrlPage', ['id' => $id]);
+
+    return $response->withRedirect($redirectedUrl);
 });
 
 $app->run();

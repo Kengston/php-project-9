@@ -48,6 +48,7 @@
         <h1 class="display-4">Добро пожаловать!</h1>
         <p class="lead">Это анализатор страницы. Введите адрес веб-страницы для получения информации о ней.</p>
         <form action="/analyze" method="POST">
+            <input type="hidden" name="_METHOD" value="GET">
             <div class="form-row align-items-center">
                 <div class="col-auto">
                     <label class="sr-only" for="url">Адрес страницы</label>

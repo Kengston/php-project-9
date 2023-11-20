@@ -1,14 +1,26 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Список сайтов</title>
+    <title>Page Not Found</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             padding-top: 60px;
         }
+
+        .container {
+            max-width: 800px;
+        }
+
+        .not-found {
+            text-align: center;
+            font-size: 48px;
+            margin-top: 100px;
+        }
+
         footer.footer {
             position: absolute;
             bottom: 0;
@@ -19,8 +31,8 @@
         }
     </style>
 </head>
-<body>
 
+<body>
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container">
         <a class="navbar-brand" href="#">Анализатор страницы</a>
@@ -40,31 +52,9 @@
     </div>
 </nav>
 
-<main role="main" class="container">
-    <h1>Список сайтов</h1>
-    <table class="table" data-test="urls">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Название сайта</th>
-            <th>Дата создания</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php
-        /**
-         * @var array $urls
-         */
-        foreach ($urls as $url): ?>
-            <tr data-test="url">
-                <td><?= $url->id ?></td>
-                <td><a href="/urls/<?= $url->id ?>"><?= $url->name ?></a></td>
-                <td><?= $url->created_at ?></td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-</main>
+<div class="container">
+    <div class="not-found">ОПАНЬКИ:( (NOT FOUND)</div>
+</div>
 
 <footer class="footer">
     <div class="container">
@@ -76,4 +66,5 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>
