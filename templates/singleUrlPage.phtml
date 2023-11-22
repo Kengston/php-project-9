@@ -29,7 +29,8 @@
         }
 
         footer.footer {
-            position: absolute;
+            position: fixed;
+            left: 0;
             bottom: 0;
             width: 100%;
             height: 60px;
@@ -95,6 +96,39 @@
             <p class="card-text"><strong>Дата создания:</strong> <?= $url->created_at ?></p>
             <!-- Другие детали о URL -->
         </div>
+    </div>
+</div>
+
+<div class="container mt-3">
+    <form action="/urls/<?= $url->id ?>/checks" method="POST">
+        <button type="submit" class="btn btn-primary">Создать проверку</button>
+    </form>
+
+    <!-- Блок для отображения проверок -->
+    <div class="mt-4">
+        <h5>Проверки</h5>
+        <?php if (!empty($urlChecks)): ?>
+            <table class="table table-checks">
+                <thead>
+                <tr>
+                    <th>ID проверки</th>
+                    <th>Дата</th>
+                    <!-- Другие заголовки, если нужно -->
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($urlChecks as $check): ?>
+                    <tr>
+                        <td><?= $check->id ?></td>
+                        <td><?= $check->created_at ?></td>
+                        <!-- Другие данные проверки, если нужно -->
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p>Нет доступных проверок для этого URL</p>
+        <?php endif; ?>
     </div>
 </div>
 

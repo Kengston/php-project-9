@@ -21,6 +21,13 @@
 </head>
 <body>
 
+<?php
+/**
+ * @var $urls
+ * */
+
+?>
+
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container">
         <a class="navbar-brand" href="#">Анализатор страницы</a>
@@ -48,20 +55,20 @@
             <th>ID</th>
             <th>Название сайта</th>
             <th>Дата создания</th>
+            <th>Дата последней проверки</th>
         </tr>
         </thead>
         <tbody>
-        <?php
-        /**
-         * @var array $urls
-         */
-        foreach ($urls as $url): ?>
-            <tr data-test="url">
-                <td><?= $url->id ?></td>
-                <td><a href="/urls/<?= $url->id ?>"><?= $url->name ?></a></td>
-                <td><?= $url->created_at ?></td>
-            </tr>
-        <?php endforeach; ?>
+            <?php foreach ($urls as $url): ?>
+                <tr data-test="url">
+                    <td><?= $url->id ?></td>
+                    <td><a href="/urls/<?= $url->id ?>"><?= $url->name ?></a></td>
+                    <td><?= $url->created_at ?></td>
+                    <td>
+                        <?= $url->lastCheckDate ? $url->lastCheckDate : 'Нет данных' ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
         </tbody>
     </table>
 </main>

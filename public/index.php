@@ -1,5 +1,6 @@
 <?php
 
+namespace App;
 require __DIR__ . '/../vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
@@ -7,6 +8,8 @@ use Slim\Views\PhpRenderer;
 use DI\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Model;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 $container = new Container();
 AppFactory::setContainer($container);
@@ -43,6 +46,25 @@ class Url extends Model
     protected $fillable = ['name'];
 }
 
+class UrlCheck extends Model
+{
+    protected $table = 'url_checks';
+
+    protected $fillable = [
+        'url_id',
+        'status_code',
+        'h1',
+        'title',
+        'description',
+        'created_at',
+        'updated_at'
+    ];
+
+    public function url() {
+        return $this->belongsTo(Url::class);
+    }
+}
+
 $app->get('/', function ($request, $response) {
     return $this->get('renderer')->render($response, 'mainPage.phtml');
 });
@@ -50,10 +72,16 @@ $app->get('/', function ($request, $response) {
 $app->get('/urls', function ($request, $response) {
     $urls = Url::orderBy('created_at', 'desc')->get();
 
+    foreach ($urls as $url) {
+        $lastCheck = UrlCheck::where('url_id', $url->id)->orderBy('created_at', 'desc')->first();
+        $url->lastCheckDate = $lastCheck ? $lastCheck->created_at : null;
+    }
+
     return $this->get('renderer')->render($response, 'allUrlsPage.phtml', [
         'urls' => $urls
     ]);
 });
+
 
 $app->get('/urls/{id}', function ($request, $response, $args) {
    $urlId = $args['id'];
@@ -69,8 +97,11 @@ $app->get('/urls/{id}', function ($request, $response, $args) {
    $successMessages = $flash->getMessage('success');
    $errorMessages = $flash->getMessage('error');
 
+   $urlChecks = UrlCheck::where('url_id', $urlId)->orderBy('created_at', 'desc')->get();
+
     return $this->get('renderer')->render($response, 'singleUrlPage.phtml', [
         'url' => $url,
+        'urlChecks' => $urlChecks,
         'successMessages' => $successMessages,
         'errorMessages' => $errorMessages
     ]);
@@ -100,5 +131,18 @@ $app->post('/analyze', function ($request, $response) use ($app) {
 
     return $response->withRedirect($redirectedUrl);
 });
+
+$app->post('/urls/{url_id}/checks', function (Request $request, Response $response, array $args) {
+    $urlId = $args['url_id'];
+
+    $urlCheck = new UrlCheck();
+    $urlCheck->url_id = $urlId;
+    $urlCheck->created_at = date("Y-m-d H:i:s");
+
+    $urlCheck->save();
+
+    return $response->withHeader('Location', '/urls/' . $urlId)->withStatus(302);
+});
+
 
 $app->run();
