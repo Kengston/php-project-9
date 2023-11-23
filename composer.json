@@ -1,5 +1,3 @@
-
-
 {
     "name": "hexlet/code",
     "description": "hexlet project page analyzer",
@@ -18,6 +16,7 @@
         "illuminate/support": "^10.32",
         "illuminate/events": "^10.32",
         "illuminate/database": "^10.32",
-        "slim/flash": "^0.4.0"
+        "slim/flash": "^0.4.0",
+        "guzzlehttp/guzzle": "^7.8"
     }
 }

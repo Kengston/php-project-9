@@ -6,6 +6,8 @@ require __DIR__ . '/../vendor/autoload.php';
 use Slim\Factory\AppFactory;
 use Slim\Views\PhpRenderer;
 use DI\Container;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Model;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -77,6 +79,11 @@ $app->get('/urls', function ($request, $response) {
         $url->lastCheckDate = $lastCheck ? $lastCheck->created_at : null;
     }
 
+    foreach ($urls as $url) {
+        $lastCheck = UrlCheck::where('url_id', $url->id)->orderBy('status_code', 'desc')->first();
+        $url->status_code = $lastCheck ? $lastCheck->status_code : null;
+    }
+
     return $this->get('renderer')->render($response, 'allUrlsPage.phtml', [
         'urls' => $urls
     ]);
@@ -132,16 +139,33 @@ $app->post('/analyze', function ($request, $response) use ($app) {
     return $response->withRedirect($redirectedUrl);
 });
 
-$app->post('/urls/{url_id}/checks', function (Request $request, Response $response, array $args) {
+$app->post('/urls/{url_id}/checks', function ($request, $response, array $args) {
     $urlId = $args['url_id'];
 
-    $urlCheck = new UrlCheck();
-    $urlCheck->url_id = $urlId;
-    $urlCheck->created_at = date("Y-m-d H:i:s");
+    $url = Url::find($urlId);
 
-    $urlCheck->save();
+    if (!$url) {
+        return $response->withHeader('Location', '/urls/' . $urlId)->withStatus(302);
+    }
 
-    return $response->withHeader('Location', '/urls/' . $urlId)->withStatus(302);
+    $client = new Client();
+
+    try {
+        $res = $client->request('GET', $url->name);
+        $statusCode = $res->getStatusCode();
+
+        $urlCheck = new UrlCheck();
+        $urlCheck->url_id = $urlId;
+        $urlCheck->status_code = $statusCode;
+        $urlCheck->created_at = date("Y-m-d H:i:s");
+        $urlCheck->save();
+
+        return $response->withHeader('Location', '/urls/' . $urlId)->withStatus(302);
+    } catch (RequestException $e) {
+
+        /** TODO: catch errors */
+        return $response->withHeader('Location', '/urls/' . $urlId)->withStatus(302);
+    }
 });
 
 
