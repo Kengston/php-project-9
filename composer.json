@@ -17,6 +17,7 @@
         "illuminate/events": "^10.32",
         "illuminate/database": "^10.32",
         "slim/flash": "^0.4.0",
-        "guzzlehttp/guzzle": "^7.8"
+        "guzzlehttp/guzzle": "^7.8",
+        "imangazaliev/didom": "^2.0"
     }
 }

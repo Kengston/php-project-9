@@ -103,7 +103,6 @@
     <form action="/urls/<?= $url->id ?>/checks" method="POST">
         <button type="submit" class="btn btn-primary">Создать проверку</button>
     </form>
-
     <!-- Блок для отображения проверок -->
     <div class="mt-4">
         <h5>Проверки</h5>
@@ -113,7 +112,10 @@
                 <tr>
                     <th>ID проверки</th>
                     <th>Дата</th>
-                    <th>Код ответа</th> <!-- Новая колонка для кода ответа -->
+                    <th>Код ответа</th>
+                    <th>Title</th> <!-- Новая колонка для вывода Title -->
+                    <th>Description</th> <!-- Новая колонка для вывода Description -->
+                    <th>H1</th> <!-- Новая колонка для вывода H1 -->
                     <!-- Другие заголовки, если нужно -->
                 </tr>
                 </thead>
@@ -122,8 +124,10 @@
                     <tr>
                         <td><?= $check->id ?></td>
                         <td><?= $check->created_at ?></td>
-                        <td><?= $check->status_code ?></td> <!-- Отображение кода ответа -->
-                        <!-- Другие данные проверки, если нужно -->
+                        <td><?= $check->status_code ?></td>
+                        <td><?= $check->title ?? 'Нет данных' ?></td>
+                        <td><?= $check->description ?? 'Нет данных' ?></td>
+                        <td><?= $check->h1 ?? 'Нет данных' ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

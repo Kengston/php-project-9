@@ -10,8 +10,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Model;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use DiDom\Document;
+
 
 $container = new Container();
 AppFactory::setContainer($container);
@@ -84,6 +84,21 @@ $app->get('/urls', function ($request, $response) {
         $url->status_code = $lastCheck ? $lastCheck->status_code : null;
     }
 
+    foreach ($urls as $url) {
+        $lastCheck = UrlCheck::where('url_id', $url->id)->orderBy('h1', 'desc')->first();
+        $url->h1 = $lastCheck ? $lastCheck->h1 : null;
+    }
+
+    foreach ($urls as $url) {
+        $lastCheck = UrlCheck::where('url_id', $url->id)->orderBy('title', 'desc')->first();
+        $url->title = $lastCheck ? $lastCheck->title : null;
+    }
+
+    foreach ($urls as $url) {
+        $lastCheck = UrlCheck::where('url_id', $url->id)->orderBy('description', 'desc')->first();
+        $url->description = $lastCheck ? $lastCheck->description : null;
+    }
+
     return $this->get('renderer')->render($response, 'allUrlsPage.phtml', [
         'urls' => $urls
     ]);
@@ -154,10 +169,22 @@ $app->post('/urls/{url_id}/checks', function ($request, $response, array $args) 
         $res = $client->request('GET', $url->name);
         $statusCode = $res->getStatusCode();
 
+        $html = (string) $res->getBody();
+
+        $document = new Document($html);
+
+        $h1 = optional($document->first('h1'))->text();
+        $title = optional($document->first('title'))->text();
+        $description = optional($document->first('meta[name="description"]'))->getAttribute('content');
+
         $urlCheck = new UrlCheck();
         $urlCheck->url_id = $urlId;
         $urlCheck->status_code = $statusCode;
         $urlCheck->created_at = date("Y-m-d H:i:s");
+        $urlCheck->h1 = $h1;
+        $urlCheck->title = $title;
+        $urlCheck->description = $description;
+
         $urlCheck->save();
 
         return $response->withHeader('Location', '/urls/' . $urlId)->withStatus(302);
